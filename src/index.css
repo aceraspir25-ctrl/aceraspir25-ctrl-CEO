@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@1,400;1,700;1,900&family=JetBrains+Mono:wght@400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Playfair Display", serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-surface-lowest: #0a0a0a;
+  --color-surface-low: #111111;
+  --color-surface: #151515;
+  --color-surface-high: #222222;
+  --color-surface-highest: #333333;
+  
+  --color-primary: #FF4D00;
+  --color-primary-container: #FF4D00;
+  --color-on-primary-container: #000000;
+  
+  --color-secondary: #F5F5F0;
+  
+  --color-error: #FF3B30;
+  --color-success: #13FF43;
+
+  --color-accent: #FF4D00;
+  --color-ink: #E5E5E5;
+}
+
+@layer base {
+  body {
+    @apply bg-[#0A0A0A] text-[#E5E5E5] selection:bg-accent/30;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .art-panel {
+    @apply bg-surface/40 border border-surface-high transition-all duration-300;
+  }
+  
+  .art-border {
+    @apply border-surface-high;
+  }
+
+  .label-micro {
+    @apply text-[9px] uppercase tracking-[0.4em] font-bold text-white/40;
+  }
+
+  .serif-italic {
+    @apply font-serif italic;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-black font-bold uppercase tracking-widest text-[10px] px-6 py-2 transition-all hover:brightness-110 active:scale-95;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 2px;
+}
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-highest hover:bg-accent transition-colors;
+}
+

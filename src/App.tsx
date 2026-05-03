@@ -21,7 +21,7 @@ import { Product } from './components/Product';
 import { CommandSystem } from './components/CommandSystem';
 import { ScreenStatus, UserPersona } from './types';
 import { motion, AnimatePresence } from 'motion/react';
-import { PERSONAS, getInitialScreen } from './constants';
+import { PERSONAS, PERSONA_RECOMMENDED_SCREENS, getInitialScreen } from './constants';
 
 export default function App() {
   const [activeScreen, setActiveScreen] = useState<ScreenStatus>('DASHBOARD');
@@ -30,12 +30,46 @@ export default function App() {
     return (saved as UserPersona) || null;
   });
   
-  const isApiKeyValid = !!process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY !== 'undefined' && process.env.GEMINI_API_KEY.length > 0;
+  const [isApiKeyValid, setIsApiKeyValid] = useState<boolean>(true);
+
+  React.useEffect(() => {
+    const checkApiKey = async () => {
+      try {
+        const response = await fetch('/api/ai/check-status', { method: 'POST' });
+        const data = await response.json();
+        setIsApiKeyValid(data.valid);
+      } catch (error) {
+        console.error('Failed to verify API key:', error);
+        setIsApiKeyValid(false);
+      }
+    };
+    checkApiKey();
+  }, []);
+
+  const handleScreenChange = (screen: ScreenStatus) => {
+    if (!userPersona) return;
+    
+    const allowedScreens = PERSONA_RECOMMENDED_SCREENS[userPersona] || ['DASHBOARD'];
+    if (allowedScreens.includes(screen) || screen === 'DASHBOARD') {
+      setActiveScreen(screen);
+    } else {
+      console.warn(`Access denied to screen: ${screen} for persona: ${userPersona}`);
+      // Optionally show an alert or notification here
+    }
+  };
+
+  const handlePersonaChange = (persona: UserPersona | null) => {
+    setUserPersona(persona);
+    if (persona) {
+      localStorage.setItem('omni_persona', persona);
+      setActiveScreen(getInitialScreen(persona));
+    } else {
+      localStorage.removeItem('omni_persona');
+    }
+  };
 
   const handlePersonaSelect = (persona: UserPersona) => {
-    setUserPersona(persona);
-    localStorage.setItem('omni_persona', persona);
-    setActiveScreen(getInitialScreen(persona));
+    handlePersonaChange(persona);
   };
 
   const renderScreen = () => {
@@ -121,10 +155,10 @@ export default function App() {
 
       <Layout 
         activeScreen={activeScreen} 
-        onScreenChange={setActiveScreen} 
+        onScreenChange={handleScreenChange} 
         isApiKeyValid={isApiKeyValid}
         userPersona={userPersona || 'BOD'}
-        onPersonaChange={setUserPersona}
+        onPersonaChange={handlePersonaChange}
       >
         {renderScreen()}
       </Layout>

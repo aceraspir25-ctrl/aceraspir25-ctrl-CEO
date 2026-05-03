@@ -44,17 +44,19 @@ interface LayoutProps {
 
 const NAV_ITEMS: { id: ScreenStatus; label: string; icon: React.ElementType }[] = [
   { id: 'COMMAND_SYSTEM', label: 'Terminal', icon: Terminal },
-  { id: 'DASHBOARD', label: 'Command', icon: LayoutDashboard },
+  { id: 'DASHBOARD', label: 'Command Hub', icon: LayoutDashboard },
   { id: 'EXECUTIVE', label: 'CEO / BOD', icon: TrendingUp },
-  { id: 'HR', label: 'HR / Staff', icon: Users },
+  { id: 'HR', label: 'HR / Personnel', icon: Users },
   { id: 'PRODUCT', label: 'PM / Product', icon: Archive },
-  { id: 'ENGINEERING', label: 'Eng / DevOps', icon: Code },
-  { id: 'QA', label: 'QA / Testing', icon: Bug },
-  { id: 'SALES', label: 'Sales / Mkt', icon: DollarSign },
+  { id: 'ENGINEERING', label: 'Eng / Logic', icon: Code },
+  { id: 'INFRA', label: 'Infrastructure', icon: Cpu },
+  { id: 'QA', label: 'QA / Security', icon: Bug },
+  { id: 'SALES', label: 'Sales / Growth', icon: DollarSign },
   { id: 'DESIGN', label: 'Design / UX', icon: PenTool },
   { id: 'MARKET', label: 'Market / Res', icon: PieChart },
   { id: 'SECURITY', label: 'Security', icon: ShieldAlert },
   { id: 'GUIDE', label: 'Academy', icon: BookOpen },
+  { id: 'WORKLOAD', label: 'Workload', icon: Activity },
 ];
 
 export const Layout: React.FC<LayoutProps> = ({ 
@@ -70,7 +72,8 @@ export const Layout: React.FC<LayoutProps> = ({
   const [theme, setTheme] = React.useState<'dark' | 'light'>('dark');
   const [lang, setLang] = React.useState<'EN' | 'HI'>('EN');
 
-  const recommendedScreens = PERSONA_RECOMMENDED_SCREENS[userPersona] || [];
+  const recommendedScreens = PERSONA_RECOMMENDED_SCREENS[userPersona] || ['DASHBOARD'];
+  const allowedNavItems = NAV_ITEMS.filter(item => recommendedScreens.includes(item.id) || item.id === 'DASHBOARD');
 
   React.useEffect(() => {
     if (!isApiKeyValid) return;
@@ -145,8 +148,12 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
 
         <nav className="flex-1 space-y-0 px-0 pt-4 overflow-y-auto custom-scrollbar">
-          <p className="mb-6 px-8 label-micro opacity-20">Systems // 04</p>
-          {NAV_ITEMS.map((item) => {
+          <div className="px-8 pb-4">
+            <p className="label-micro opacity-20 uppercase">Systems // 04</p>
+            <p className="text-[8px] font-mono text-accent mt-1 uppercase tracking-tighter">Persona_Restricted_Access: ON</p>
+          </div>
+          
+          {allowedNavItems.map((item) => {
             const isRecommended = recommendedScreens.includes(item.id);
             return (
               <button
@@ -183,9 +190,9 @@ export const Layout: React.FC<LayoutProps> = ({
       </aside>
 
       {/* Top Bar */}
-      <header className={`fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-between px-12 border-b transition-colors duration-500 ${theme === 'dark' ? 'bg-[#0A0A0A] border-surface-high' : 'bg-white border-gray-200'}`}>
-        <div className="flex items-center gap-10">
-          <div className="flex items-center gap-4">
+      <header className={`fixed top-0 left-0 right-0 z-50 flex h-20 items-center justify-between px-6 md:px-12 border-b transition-colors duration-500 ${theme === 'dark' ? 'bg-[#0A0A0A] border-surface-high' : 'bg-white border-gray-200'}`}>
+        <div className="flex items-center gap-4 md:gap-10">
+          <div className="flex items-center gap-2 md:gap-4">
             {activeScreen !== 'DASHBOARD' && (
               <button 
                 onClick={() => onScreenChange('DASHBOARD')}
@@ -194,39 +201,42 @@ export const Layout: React.FC<LayoutProps> = ({
                 <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
               </button>
             )}
-            <div className={`text-xs tracking-[0.4em] font-bold uppercase ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-              Kinetic // 04
+            <div className={`text-[10px] md:text-xs tracking-[0.3em] md:tracking-[0.4em] font-bold uppercase ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+              TRIDEV
             </div>
           </div>
           <div className="hidden h-10 w-[1px] bg-surface-high md:block" />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
              <div className={`h-1.5 w-1.5 rounded-full shadow-[0_0_8px_#ff4d00] transition-all duration-500 ${
                !isApiKeyValid ? 'bg-error shadow-error animate-pulse' :
                agentStatus === 'ANALYZING' ? 'bg-success animate-ping shadow-success' : 
                agentStatus === 'PATCHING' ? 'bg-accent animate-spin' : 
                agentStatus === 'MONITORING' ? 'bg-accent animate-pulse' : 'bg-gray-700'
              }`} />
-             <span className={`label-micro ${theme === 'dark' ? 'text-white/60' : 'text-gray-500'}`}>AI_Agent: {!isApiKeyValid ? 'ERROR' : agentStatus}</span>
+             <span className={`label-micro whitespace-nowrap ${theme === 'dark' ? 'text-white/60' : 'text-gray-500'}`}>
+               <span className="hidden xs:inline">AI_Agent: </span>
+               {!isApiKeyValid ? 'ERROR' : agentStatus}
+             </span>
           </div>
           <div className="hidden h-10 w-[1px] bg-surface-high lg:block" />
           <span className={`hidden font-serif italic text-lg lg:block ${theme === 'dark' ? 'text-white' : 'text-gray-900'}`}>Neural Command</span>
         </div>
 
-        <div className="flex items-center gap-12">
-          <div className="hidden gap-8 text-[10px] tracking-widest uppercase font-medium md:flex text-white/40">
+        <div className="flex items-center gap-4 md:gap-12">
+          <div className="hidden gap-8 text-[10px] tracking-widest uppercase font-medium xl:flex text-white/40">
             <span>Archive</span>
             <span>Series</span>
             <span>Manifesto</span>
           </div>
           
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4 border-r border-surface-high pr-6">
+          <div className="flex items-center gap-3 md:gap-6">
+            <div className="flex items-center gap-2 md:gap-4 border-r border-surface-high pr-3 md:pr-6">
               <button 
                 onClick={() => setLang(l => l === 'EN' ? 'HI' : 'EN')}
-                className={`flex items-center gap-2 label-micro transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
+                className={`flex items-center gap-1 md:gap-2 label-micro transition-colors ${theme === 'dark' ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-black'}`}
               >
                 <Languages className="h-3.5 w-3.5" />
-                <span>{lang}</span>
+                <span className="hidden xs:inline">{lang}</span>
               </button>
               <button 
                 onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
@@ -235,7 +245,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
               </button>
             </div>
-            <div className="relative h-10 w-24 bg-accent flex items-center justify-center text-[10px] font-bold tracking-widest uppercase text-black cursor-pointer hover:brightness-110 transition-all">
+            <div className="hidden sm:flex relative h-10 w-24 bg-accent items-center justify-center text-[10px] font-bold tracking-widest uppercase text-black cursor-pointer hover:brightness-110 transition-all">
               Systems
             </div>
             <Settings className={`h-4 w-4 cursor-pointer transition-colors ${theme === 'dark' ? 'text-gray-500 hover:text-white' : 'text-gray-400 hover:text-black'}`} />
@@ -243,32 +253,34 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
       </header>
 
+
       {/* Main Content Area */}
       <main className={`flex-1 transition-all md:ml-64 relative min-h-screen pt-20 pb-20 md:pb-0 ${theme === 'dark' ? 'bg-[#0A0A0A]' : 'bg-gray-50'}`}>
         {!isApiKeyValid && (
-          <div className="bg-error/20 border-b border-error p-4 flex items-center justify-between">
+          <div className="bg-error/20 border-b border-error p-4 flex items-center justify-between sticky top-20 z-30 backdrop-blur-md">
             <div className="flex items-center gap-4">
-              <ShieldAlert className="h-5 w-5 text-error" />
-              <p className="font-mono text-xs text-error uppercase tracking-widest font-bold">
-                API_KEY_ERROR: Neural Command module offline. Please provide a valid GEMINI_API_KEY.
+              <ShieldAlert className="h-5 w-5 text-error shrink-0" />
+              <p className="font-mono text-[10px] md:text-xs text-error uppercase tracking-widest font-bold">
+                API_KEY_ERROR: Neural Command module offline. Provide GEMINI_API_KEY.
               </p>
             </div>
-            <div className="h-2 w-2 rounded-full bg-error animate-ping" />
+            <div className="h-2 w-2 rounded-full bg-error animate-ping shrink-0" />
           </div>
         )}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeScreen}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4 }}
-            className="p-8 md:p-12"
+            initial={{ opacity: 0, x: 5 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -5 }}
+            transition={{ duration: 0.3 }}
+            className="p-4 sm:p-8 md:p-12 max-w-7xl mx-auto"
           >
             {children}
           </motion.div>
         </AnimatePresence>
       </main>
+
 
       {/* Footer (New addition mapping to the design) */}
       <footer className="fixed bottom-0 left-64 right-0 h-16 border-t border-surface-high hidden md:flex items-center justify-between px-12 text-[9px] uppercase tracking-widest opacity-40 bg-[#0A0A0A] z-40">
@@ -277,20 +289,21 @@ export const Layout: React.FC<LayoutProps> = ({
       </footer>
 
       {/* Bottom Nav for Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 items-center justify-around border-t border-surface-high bg-[#0A0A0A] px-4 md:hidden">
-        {NAV_ITEMS.map((item) => (
+      <nav className="fixed bottom-0 left-0 right-0 z-50 flex h-20 items-center justify-around border-t border-surface-high bg-[#0A0A0A]/95 backdrop-blur-lg px-2 md:hidden">
+        {allowedNavItems.map((item) => (
           <button
             key={item.id}
             onClick={() => onScreenChange(item.id)}
-            className={`flex flex-col items-center gap-1 transition-colors ${
+            className={`flex flex-col items-center justify-center gap-1.5 transition-all text-[8px] active:scale-95 touch-manipulation ${
               activeScreen === item.id ? 'text-accent' : 'text-gray-500'
             }`}
           >
-            <item.icon className="h-4 w-4" />
-            <span className="label-micro" style={{ opacity: 1, fontSize: '8px' }}>{item.id.slice(0, 4)}</span>
+            <item.icon className={`h-4.5 w-4.5 transition-transform ${activeScreen === item.id ? 'scale-110' : ''}`} />
+            <span className="label-micro uppercase font-bold tracking-tighter" style={{ opacity: 1 }}>{item.label.split(' ')[0]}</span>
           </button>
         ))}
       </nav>
+
     </div>
   );
 };

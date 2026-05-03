@@ -139,6 +139,51 @@ export const Security: React.FC = () => {
         </div>
       </section>
 
+      {/* API Configuration & Security */}
+      <section className="space-y-8">
+        <div className="flex items-center gap-3 px-2">
+          <Lock className="h-4 w-4 text-accent" />
+          <h3 className="label-micro opacity-40 uppercase tracking-widest">Secret_Management_System</h3>
+        </div>
+        
+        <div className="p-10 bg-[#0A0A0A] border border-surface-high space-y-8">
+          <div className="flex flex-col md:flex-row gap-10 items-start">
+            <div className="flex-1 space-y-4">
+              <label className="label-micro text-white/60 block">Neural_Access_Key (GEMINI_API_KEY)</label>
+              <div className="relative w-full max-w-md group">
+                <input 
+                  type="password" 
+                  placeholder="AIzaSy..."
+                  className="w-full bg-white/[0.02] border border-surface-high p-4 font-mono text-xs text-white focus:border-accent outline-none transition-all pr-12"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 group-hover:block hidden">
+                  <div className="relative group/tooltip">
+                    <Info className="h-4 w-4 text-accent cursor-help" />
+                    <div className="absolute bottom-full right-0 mb-2 w-64 p-3 bg-error text-white text-[10px] font-mono leading-relaxed opacity-0 group-hover/tooltip:opacity-100 transition-opacity pointer-events-none z-50 border border-white/20 shadow-2xl">
+                       <p className="font-bold mb-1 uppercase tracking-tighter">SECURITY_PROTOCOL_WARNING:</p>
+                       NEVER commit API keys directly to version control. Use environment variables (.env) or a secure secrets management solution for production environments. Secure your 'Neural Command' instance.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="text-[10px] text-gray-600 font-mono italic">
+                * Note: In this environment, variables should be set via the 'Settings' menu of the platform.
+              </p>
+            </div>
+
+            <div className="w-full md:w-1/3 bg-white/[0.02] border border-white/5 p-6 space-y-4">
+               <div className="flex items-center gap-2 text-error">
+                  <AlertOctagon className="h-4 w-4" />
+                  <span className="label-micro font-bold">Hardening_Tip</span>
+               </div>
+               <p className="text-[10px] text-gray-500 leading-relaxed uppercase tracking-tighter">
+                  Always use environment variables for sensitive credentials. Leaking API keys can lead to unauthorized billing and data exposure.
+               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Raw Logs */}
       <section className="space-y-6 pb-12">
         <h3 className="label-micro px-2 opacity-40">Raw_System_Logs</h3>

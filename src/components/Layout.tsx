@@ -13,6 +13,7 @@ import {
   ShieldAlert, 
   TrendingUp, 
   Cpu, 
+  Zap,
   Bell,
   Settings,
   CircleUser,
@@ -45,6 +46,7 @@ interface LayoutProps {
 const NAV_ITEMS: { id: ScreenStatus; label: string; icon: React.ElementType }[] = [
   { id: 'COMMAND_SYSTEM', label: 'Terminal', icon: Terminal },
   { id: 'DASHBOARD', label: 'Command Hub', icon: LayoutDashboard },
+  { id: 'SYSTEM_STATUS', label: 'System Status', icon: Zap },
   { id: 'EXECUTIVE', label: 'CEO / BOD', icon: TrendingUp },
   { id: 'HR', label: 'HR / Personnel', icon: Users },
   { id: 'PRODUCT', label: 'PM / Product', icon: Archive },

@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
-import { motion } from 'motion/react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   TrendingUp, 
   Search, 
@@ -12,10 +12,16 @@ import {
   BarChart3, 
   Globe, 
   MessageSquare,
-  Users
+  Users,
+  Sparkles,
+  Loader2,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
+import { GoogleGenAI } from "@google/genai";
 
 const containerVariants = {
+// ... existing variants ...
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -32,6 +38,7 @@ const itemVariants = {
 };
 
 const INSIGHTS = [
+// ... existing insights ...
   {
     category: 'Logistics Research',
     title: 'BharatPath Route Optimization',
@@ -56,6 +63,36 @@ const INSIGHTS = [
 ];
 
 export const Market: React.FC = () => {
+  const [summaries, setSummaries] = useState<Record<number, string>>({});
+  const [loading, setLoading] = useState<Record<number, boolean>>({});
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+
+  const handleSummarize = async (index: number, content: string) => {
+    if (summaries[index]) {
+      setExpanded(prev => ({ ...prev, [index]: !prev[index] }));
+      return;
+    }
+
+    setLoading(prev => ({ ...prev, [index]: true }));
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: `Provide a concise, bulleted summary of the key takeaways from the following market insight: "${content}"`,
+      });
+      
+      const text = response.text || "No summary available.";
+      setSummaries(prev => ({ ...prev, [index]: text }));
+      setExpanded(prev => ({ ...prev, [index]: true }));
+    } catch (error) {
+      console.error("Summarization failed:", error);
+      setSummaries(prev => ({ ...prev, [index]: "AI integration required for real-time synthesis. Please ensure GEMINI_API_KEY is configured." }));
+      setExpanded(prev => ({ ...prev, [index]: true }));
+    } finally {
+      setLoading(prev => ({ ...prev, [index]: false }));
+    }
+  };
+
   return (
     <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-12">
       {/* Editorial Header */}
@@ -110,14 +147,53 @@ export const Market: React.FC = () => {
             <motion.div 
               key={i} 
               variants={itemVariants}
-              className="p-10 flex flex-col md:flex-row gap-10 bg-[#0A0A0A] hover:bg-white/[0.02] transition-all"
+              className="p-10 flex flex-col md:flex-row gap-10 bg-[#0A0A0A] hover:bg-white/[0.02] transition-all group"
             >
               <div className="md:w-1/4">
                  <p className="label-micro mb-1 opacity-40">{insight.category}</p>
                  <h4 className={`font-mono text-xs font-bold uppercase tracking-tight ${insight.color}`}>{insight.title}</h4>
               </div>
-              <div className="flex-1">
+              <div className="flex-1 space-y-6">
                  <p className="text-sm font-serif italic text-gray-500 leading-relaxed">{insight.detail}</p>
+                 
+                 {/* AI Summarization Feature */}
+                 <div className="pt-4 border-t border-white/5">
+                    <button 
+                      onClick={() => handleSummarize(i, insight.detail)}
+                      disabled={loading[i]}
+                      className="flex items-center gap-2 label-micro text-accent hover:text-white transition-colors disabled:opacity-50"
+                    >
+                      {loading[i] ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Sparkles className="h-3 w-3" />
+                      )}
+                      {summaries[i] ? (expanded[i] ? 'COLLAPSE_SUMMARY' : 'SHOW_SUMMARY') : 'SUMMARIZE_WITH_GEMINI'}
+                      {summaries[i] && (
+                        expanded[i] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                      )}
+                    </button>
+
+                    <AnimatePresence>
+                      {expanded[i] && summaries[i] && (
+                        <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="mt-4 p-4 bg-white/[0.03] border-l-2 border-accent/20">
+                            <p className="label-micro text-[8px] text-accent/40 mb-2 uppercase tracking-tighter">Neural_Synthesis_Result:</p>
+                            <div className="text-[11px] font-mono text-gray-400 prose prose-invert max-w-none">
+                               {summaries[i].split('\n').map((line, idx) => (
+                                 <p key={idx} className="my-1">{line}</p>
+                               ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                 </div>
               </div>
               <div className="md:w-1/4 flex items-end justify-end">
                 <div className="label-micro px-3 py-1 border border-surface-high">
@@ -156,3 +232,4 @@ export const Market: React.FC = () => {
     </motion.div>
   );
 };
+

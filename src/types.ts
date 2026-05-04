@@ -1,4 +1,4 @@
-export type ScreenStatus = 'DASHBOARD' | 'INFRA' | 'QA' | 'WORKLOAD' | 'SECURITY' | 'EXECUTIVE' | 'MARKET' | 'GUIDE' | 'ENGINEERING' | 'HR' | 'SALES' | 'DESIGN' | 'PRODUCT' | 'COMMAND_SYSTEM';
+export type ScreenStatus = 'DASHBOARD' | 'SYSTEM_STATUS' | 'INFRA' | 'QA' | 'WORKLOAD' | 'SECURITY' | 'EXECUTIVE' | 'MARKET' | 'GUIDE' | 'ENGINEERING' | 'HR' | 'SALES' | 'DESIGN' | 'PRODUCT' | 'COMMAND_SYSTEM';
 
 export type UserPersona = 'CEO' | 'ENGINEER' | 'HR' | 'PRODUCT' | 'SALES' | 'DESIGN' | 'BOD' | 'STAFF' | 'QA' | 'DEVOPS' | 'GUIDE';
 

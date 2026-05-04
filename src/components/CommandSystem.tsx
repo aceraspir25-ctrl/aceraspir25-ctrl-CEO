@@ -32,7 +32,33 @@ const INITIAL_LOGS: Log[] = [
 export const CommandSystem: React.FC = () => {
   const [logs, setLogs] = useState<Log[]>(INITIAL_LOGS);
   const [hasAlert, setHasAlert] = useState(false);
+  const [userInput, setUserInput] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleSendMessage = () => {
+    if (!userInput.trim()) return;
+
+    const timestamp = new Date().toLocaleTimeString([], { hour12: false });
+    const userLog: Log = {
+      agent: 'Guide', // Using 'Guide' as placeholder for operator role in logs
+      message: `[OPERATOR]: ${userInput}`,
+      timestamp
+    };
+
+    setLogs(prev => [...prev, userLog]);
+    setUserInput('');
+
+    // Simulate Agent response after a short delay
+    setTimeout(() => {
+      const agents: Array<Log['agent']> = ['CEO', 'Engineering', 'QA', 'Marketing'];
+      const randomAgent = agents[Math.floor(Math.random() * agents.length)];
+      setLogs(prev => [...prev, {
+        agent: randomAgent,
+        message: `Query acknowledged. Vector analysis for "${userInput.substring(0, 20)}..." initializing. Status: Nominal.`,
+        timestamp: new Date().toLocaleTimeString([], { hour12: false })
+      }]);
+    }, 1000);
+  };
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -135,20 +161,49 @@ export const CommandSystem: React.FC = () => {
         ))}
       </div>
 
-      {/* Terminal Input Simulation */}
-      <div className="mt-4 border-t border-surface-high pt-4 flex items-center gap-3 z-10">
-        <ChevronRight className="h-4 w-4 text-accent" />
-        <div className="flex-1 h-6 bg-white/[0.02] border border-white/5 flex items-center px-3">
-          <span className="text-[10px] text-gray-500 italic">Awaiting operator input...</span>
-          <motion.div 
-            animate={{ opacity: [1, 0] }}
-            transition={{ duration: 0.8, repeat: Infinity }}
-            className="w-2 h-4 bg-accent ml-2"
-          />
+      {/* AI Prompt Input Area */}
+      <div className="mt-6 border-t border-surface-high pt-6 flex flex-col gap-4 z-10">
+        <div className="flex items-center gap-2">
+          <Sparkles className="h-3 w-3 text-accent" />
+          <span className="label-micro text-accent uppercase tracking-[0.2em]">Craft_Neural_Prompt</span>
         </div>
-        <div className="flex gap-2 text-[9px] uppercase tracking-widest font-bold opacity-30">
-          <span>0x4F2A</span>
-          <span>SYSCALL</span>
+        
+        <div className="flex gap-4">
+          <div className="flex-1 relative group">
+            <textarea 
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
+              placeholder="Inject command or query for strategic agents..."
+              className="w-full bg-[#0A0A0A] border border-surface-high p-4 font-mono text-[11px] text-white placeholder:text-gray-700 focus:outline-none focus:border-accent/40 min-h-[80px] resize-none transition-all group-hover:bg-white/[0.01]"
+            />
+            <div className="absolute top-0 right-0 p-2 opacity-20 pointer-events-none font-mono text-[8px] uppercase tracking-widest text-accent">
+              Input_Buffer // Ready
+            </div>
+          </div>
+          
+          <button 
+            onClick={handleSendMessage}
+            disabled={!userInput.trim()}
+            className="px-8 bg-accent text-black font-bold label-micro hover:brightness-110 active:scale-95 transition-all flex flex-col items-center justify-center gap-2 disabled:opacity-30 disabled:grayscale"
+          >
+            <Terminal className="h-4 w-4" />
+            <span>SEND_QUERY</span>
+          </button>
+        </div>
+        
+        <div className="flex justify-between items-center opacity-30">
+          <div className="flex gap-4 text-[9px] uppercase tracking-widest font-bold">
+            <span className="flex items-center gap-1"><div className="w-1 h-3 bg-accent/40" /> 0x4F2A</span>
+            <span className="flex items-center gap-1"><div className="w-1 h-3 bg-accent/40" /> SYSCALL_ACTIVE</span>
+            <span className="flex items-center gap-1"><div className="w-1 h-3 bg-accent/40" /> ENCRYPTION: AES_256</span>
+          </div>
+          <p className="label-micro italic text-[8px]">Awaiting operator instruction sequence...</p>
         </div>
       </div>
 

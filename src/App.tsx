@@ -19,6 +19,7 @@ import { Sales } from './components/Sales';
 import { Design } from './components/Design';
 import { Product } from './components/Product';
 import { CommandSystem } from './components/CommandSystem';
+import { SystemStatus } from './components/SystemStatus';
 import { ScreenStatus, UserPersona } from './types';
 import { motion, AnimatePresence } from 'motion/react';
 import { PERSONAS, PERSONA_RECOMMENDED_SCREENS, getInitialScreen } from './constants';
@@ -76,6 +77,8 @@ export default function App() {
     switch (activeScreen) {
       case 'DASHBOARD':
         return <Dashboard persona={userPersona || 'BOD'} />;
+      case 'SYSTEM_STATUS':
+        return <SystemStatus />;
       case 'INFRA':
         return <Infra />;
       case 'QA':
@@ -97,7 +100,7 @@ export default function App() {
       case 'SALES':
         return <Sales />;
       case 'DESIGN':
-        return <Design />;
+        return <Design persona={userPersona || 'STAFF'} />;
       case 'PRODUCT':
         return <Product />;
       case 'COMMAND_SYSTEM':
